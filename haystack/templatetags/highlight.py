@@ -14,12 +14,14 @@ register = template.Library()
 
 
 class HighlightNode(template.Node):
-    def __init__(self, text_block, query, html_tag=None, css_class=None, max_length=None):
+    def __init__(self, text_block, query, html_tag=None, css_class=None,
+            max_length=None, full_doc=None):
         self.text_block = template.Variable(text_block)
         self.query = template.Variable(query)
         self.html_tag = html_tag
         self.css_class = css_class
         self.max_length = max_length
+        self.full_doc = full_doc
 
         if html_tag is not None:
             self.html_tag = template.Variable(html_tag)
@@ -29,6 +31,9 @@ class HighlightNode(template.Node):
 
         if max_length is not None:
             self.max_length = template.Variable(max_length)
+
+        if full_doc is not None:
+            self.full_doc = template.Variable(full_doc)
 
     def render(self, context):
         text_block = self.text_block.resolve(context)
@@ -43,6 +48,9 @@ class HighlightNode(template.Node):
 
         if self.max_length is not None:
             kwargs['max_length'] = self.max_length.resolve(context)
+
+        if self.full_doc is not None:
+            kwargs['full_doc'] = self.full_doc.resolve(context)
 
         # Handle a user-defined highlighting function.
         if hasattr(settings, 'HAYSTACK_CUSTOM_HIGHLIGHTER') and settings.HAYSTACK_CUSTOM_HIGHLIGHTER:
@@ -115,5 +123,9 @@ def highlight(parser, token):
 
         if bit == 'max_length':
             kwargs['max_length'] = six.next(arg_bits)
+
+        if bit == 'full_doc':
+            kwargs['full_doc'] = six.next(arg_bits)
+
 
     return HighlightNode(text_block, query, **kwargs)

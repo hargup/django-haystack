@@ -23,12 +23,22 @@ class Highlighter(object):
         if 'css_class' in kwargs:
             self.css_class = kwargs['css_class']
 
+        if 'full_doc' in kwargs:
+            self.full_doc = bool(kwargs['full_doc'])
+        else:
+            self.full_doc = False
+
+
         self.query_words = set([word.lower() for word in self.query.split() if not word.startswith('-')])
 
     def highlight(self, text_block):
         self.text_block = strip_tags(text_block)
         highlight_locations = self.find_highlightable_words()
-        start_offset, end_offset = self.find_window(highlight_locations)
+        if not self.full_doc:
+            start_offset, end_offset = self.find_window(highlight_locations)
+        else:
+            start_offset = 0
+            end_offset = len(self.text_block)
         return self.render_html(highlight_locations, start_offset, end_offset)
 
     def find_highlightable_words(self):
