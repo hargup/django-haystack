@@ -32,7 +32,7 @@ class Highlighter(object):
         self.query_words = set([word.lower() for word in self.query.split() if not word.startswith('-')])
 
     def highlight(self, text_block):
-        self.text_block = strip_tags(text_block)
+        self.text_block = text_block
         highlight_locations = self.find_highlightable_words()
         if not self.full_doc:
             start_offset, end_offset = self.find_window(highlight_locations)
